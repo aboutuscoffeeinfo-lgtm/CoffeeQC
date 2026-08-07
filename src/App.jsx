@@ -1,31 +1,37 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchEntries, saveEntry, deleteEntry } from './lib/db';
-import NewEntryForm from './components/drip/NewEntryForm';
-import HistoryTab from './components/drip/HistoryTab';
+import { fetchReports, saveReport, deleteReport, addComment } from './lib/db';
+import ReportForm from './components/drip/ReportForm';
+import History from './components/drip/History';
 
 export default function App() {
-  const [entries, setEntries] = useState(null);
+  const [reports, setReports] = useState(null);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('new');
   const [toast, setToast] = useState(null); // { text, isError }
 
   useEffect(() => {
-    fetchEntries().then(setEntries).catch((e) => setError(e.message));
+    fetchReports().then(setReports).catch((e) => setError(e.message));
   }, []);
 
   const showToast = useCallback((text, isError = false) => {
     setToast({ text, isError });
   }, []);
 
-  const onSaveEntry = useCallback(async (fields) => {
-    const saved = await saveEntry(fields);
-    setEntries((es) => [saved, ...es]);
+  const onSaveReport = useCallback(async (payload) => {
+    const saved = await saveReport(payload);
+    setReports((rs) => [saved, ...rs]);
     return saved;
   }, []);
 
-  const onDeleteEntry = useCallback(async (id) => {
-    await deleteEntry(id);
-    setEntries((es) => es.filter((e) => e.id !== id));
+  const onDeleteReport = useCallback(async (id) => {
+    await deleteReport(id);
+    setReports((rs) => rs.filter((r) => r.id !== id));
+  }, []);
+
+  const onAddComment = useCallback(async (reportId, comment) => {
+    const saved = await addComment(reportId, comment);
+    setReports((rs) => rs.map((r) => (r.id === reportId ? { ...r, qc_comments: [...r.qc_comments, saved] } : r)));
+    return saved;
   }, []);
 
   const changeTab = (tab) => {
@@ -36,7 +42,7 @@ export default function App() {
   if (error) {
     return <div id="qcd-app"><div className="qcd-body"><div className="qcd-toast-err">読み込みエラー：{error}</div></div></div>;
   }
-  if (!entries) {
+  if (!reports) {
     return <div id="qcd-app"><div className="qcd-loading">読み込み中…</div></div>;
   }
 
@@ -44,18 +50,18 @@ export default function App() {
     <div id="qcd-app">
       <div className="qcd-header">
         <p className="qcd-brand">ABOUT US COFFEE</p>
-        <h1>抽出品質 QCログ</h1>
+        <h1>ドリップ抽出 QC報告書</h1>
       </div>
       <div className="qcd-tabs">
-        <button className={'qcd-tab' + (activeTab === 'new' ? ' active' : '')} onClick={() => changeTab('new')}>新規記録</button>
-        <button className={'qcd-tab' + (activeTab === 'history' ? ' active' : '')} onClick={() => changeTab('history')}>履歴（{entries.length}）</button>
+        <button className={'qcd-tab' + (activeTab === 'new' ? ' active' : '')} onClick={() => changeTab('new')}>新規入力</button>
+        <button className={'qcd-tab' + (activeTab === 'history' ? ' active' : '')} onClick={() => changeTab('history')}>履歴（{reports.length}）</button>
       </div>
       <div className="qcd-body">
         {toast && <div className={toast.isError ? 'qcd-toast-err' : 'qcd-toast'}>{toast.text}</div>}
         {activeTab === 'new' ? (
-          <NewEntryForm onSave={onSaveEntry} showToast={showToast} />
+          <ReportForm onSave={onSaveReport} showToast={showToast} />
         ) : (
-          <HistoryTab entries={entries} onDelete={onDeleteEntry} />
+          <History reports={reports} onDelete={onDeleteReport} onAddComment={onAddComment} />
         )}
       </div>
     </div>
