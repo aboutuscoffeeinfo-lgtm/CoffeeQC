@@ -4,10 +4,14 @@ function emptyPour() {
   return { time: '', dose: '' };
 }
 
+function emptySensoryCell() {
+  return { intensity: '', quality: '' };
+}
+
 export function emptySlot() {
   const sensory = {};
-  ATTRS.forEach((a) => { sensory[a] = { H: '', W: '' }; });
-  return { dose_g: '', mesh: '', pours: [emptyPour(), emptyPour(), emptyPour(), emptyPour(), emptyPour()], sensory, intensity: '', remarks: '' };
+  ATTRS.forEach((a) => { sensory[a] = { H: emptySensoryCell(), W: emptySensoryCell() }; });
+  return { dose_g: '', mesh: '', pours: [emptyPour(), emptyPour(), emptyPour(), emptyPour(), emptyPour()], sensory, remarks: '' };
 }
 
 export default function QCSlot({ slot, index, onChange, onRemove, removable }) {
@@ -19,8 +23,14 @@ export default function QCSlot({ slot, index, onChange, onRemove, removable }) {
   };
   const addPour = () => onChange({ ...slot, pours: [...slot.pours, emptyPour()] });
   const removePour = (pi) => onChange({ ...slot, pours: slot.pours.filter((_, i) => i !== pi) });
-  const setSensory = (attr, temp, value) => {
-    onChange({ ...slot, sensory: { ...slot.sensory, [attr]: { ...slot.sensory[attr], [temp]: value } } });
+  const setSensory = (attr, temp, field, value) => {
+    onChange({
+      ...slot,
+      sensory: {
+        ...slot.sensory,
+        [attr]: { ...slot.sensory[attr], [temp]: { ...slot.sensory[attr][temp], [field]: value } },
+      },
+    });
   };
 
   return (
@@ -47,29 +57,42 @@ export default function QCSlot({ slot, index, onChange, onRemove, removable }) {
       </tbody></table>
       <button type="button" className="qcd-add-pour" onClick={addPour}>+ 行を追加</button>
 
-      <table className="qcd-sensory-table" style={{ marginTop: 12 }}><tbody>
-        {ATTRS.map((attr) => (
-          <>
-            <tr key={attr + 'H'}>
-              <td className="qcd-attr-cell" rowSpan={2} style={{ width: '18%' }}>{ATTR_LABEL[attr]}</td>
-              <td className="qcd-hw-cell">H</td>
-              <td><input type="text" placeholder="評価メモ" value={slot.sensory[attr].H} onChange={(e) => setSensory(attr, 'H', e.target.value)} /></td>
-            </tr>
-            <tr key={attr + 'W'}>
-              <td className="qcd-hw-cell">W</td>
-              <td><input type="text" placeholder="評価メモ" value={slot.sensory[attr].W} onChange={(e) => setSensory(attr, 'W', e.target.value)} /></td>
-            </tr>
-          </>
-        ))}
-      </tbody></table>
-
-      <div className="qcd-intensity-row">
-        <label>Intensity</label>
-        <select value={slot.intensity} onChange={(e) => setField('intensity', e.target.value)}>
-          <option value="">未選択</option>
-          {INTENSITY_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
-      </div>
+      <table className="qcd-sensory-table" style={{ marginTop: 12 }}>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th className="qcd-sensory-head">Intensity</th>
+            <th className="qcd-sensory-head">Quality</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ATTRS.map((attr) => (
+            <>
+              <tr key={attr + 'H'}>
+                <td className="qcd-attr-cell" rowSpan={2}>{ATTR_LABEL[attr]}</td>
+                <td className="qcd-hw-cell">H</td>
+                <td>
+                  <select value={slot.sensory[attr].H.intensity} onChange={(e) => setSensory(attr, 'H', 'intensity', e.target.value)}>
+                    <option value="">—</option>
+                    {INTENSITY_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </td>
+                <td><input type="number" min="1" max="5" value={slot.sensory[attr].H.quality} onChange={(e) => setSensory(attr, 'H', 'quality', e.target.value)} /></td>
+              </tr>
+              <tr key={attr + 'W'}>
+                <td className="qcd-hw-cell">W</td>
+                <td>
+                  <select value={slot.sensory[attr].W.intensity} onChange={(e) => setSensory(attr, 'W', 'intensity', e.target.value)}>
+                    <option value="">—</option>
+                    {INTENSITY_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </td>
+                <td><input type="number" min="1" max="5" value={slot.sensory[attr].W.quality} onChange={(e) => setSensory(attr, 'W', 'quality', e.target.value)} /></td>
+              </tr>
+            </>
+          ))}
+        </tbody>
+      </table>
 
       <div className="qcd-remarks-field">
         <label>備考</label>

@@ -79,13 +79,14 @@ body {
 .qcd-pour-remove { border: none; background: transparent; color: var(--ink-soft); font-size: 14px; padding: 0 6px; line-height: 1; }
 .qcd-add-pour { border: 1px dashed var(--line); background: transparent; color: var(--ink-soft); font-size: 11px; padding: 5px 10px; border-radius: 8px; }
 
-.qcd-sensory-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 12px; }
+.qcd-sensory-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 12px; table-layout: fixed; }
 .qcd-sensory-table td { border-top: 1px solid var(--line); padding: 5px 6px; }
-.qcd-attr-cell { color: var(--amber-strong); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.qcd-sensory-table td:nth-child(1) { width: 32%; }
+.qcd-sensory-table td:nth-child(2) { width: 10%; }
+.qcd-sensory-head { text-align: left; color: var(--ink-soft); font-weight: 600; font-size: 10px; padding: 3px 6px; }
+.qcd-attr-cell { color: var(--amber-strong); font-size: 12px; font-weight: 600; white-space: nowrap; vertical-align: middle; }
 .qcd-hw-cell { font-size: 11px; color: var(--ink-soft); text-align: center; width: 22px; }
-
-.qcd-intensity-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.qcd-intensity-row label { font-size: 11px; color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+.qcd-sensory-table select, .qcd-sensory-table input { font-size: 12px; padding: 5px 6px; }
 
 .qcd-remarks-field { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
 .qcd-remarks-field label { display: block; font-size: 11px; color: var(--ink-soft); margin-bottom: 5px; font-weight: 600; }

@@ -90,12 +90,13 @@ export default function History({ reports, onDelete, onAddComment }) {
                   　確認：<b style={{ color: 'var(--ink)' }}>{r.checker || '—'}</b>
                 </div>
                 {r.qc_slots.map((s, i) => {
-                  const sensory = ATTRS.map((a) => `${ATTR_LABEL[a]} H:${s.sensory[a]?.H || '—'} W:${s.sensory[a]?.W || '—'}`).join('　');
+                  const cellText = (c) => c && (c.intensity || c.quality) ? `${c.intensity || '—'}${c.quality ? `/Q${c.quality}` : ''}` : '—';
+                  const sensory = ATTRS.map((a) => `${ATTR_LABEL[a]} H:${cellText(s.sensory[a]?.H)} W:${cellText(s.sensory[a]?.W)}`).join('　');
                   const pours = (s.pours || []).filter((p) => p.time || p.dose).map((p) => `${p.time || '—'}/${p.dose || '—'}`).join('　');
                   return (
                     <div key={i} className="qcd-shot-summary">
                       <div style={{ fontWeight: 700, marginBottom: 4 }}>
-                        {MARKS[i]} Dose {s.dose_g || '—'}g　Mesh #{s.mesh || '—'}{s.intensity ? `　Intensity ${s.intensity}` : ''}
+                        {MARKS[i]} Dose {s.dose_g || '—'}g　Mesh #{s.mesh || '—'}
                       </div>
                       {pours && <div style={{ color: 'var(--ink-soft)' }}>Time/Dose：{pours}</div>}
                       <div style={{ color: 'var(--ink-soft)' }}>{sensory}</div>
