@@ -26,12 +26,10 @@ export default function QCSlot({ slot, index, onChange, onRemove, removable }) {
   return (
     <div className="qcd-slot">
       <div className="qcd-slot-head">
-        <div className="qcd-slot-head-left">
-          <span className="qcd-badge">{MARKS[index]}</span>
-          <div className="qcd-slot-dosemesh">
-            <input type="number" step="0.1" placeholder="Dose (g)" value={slot.dose_g} onChange={(e) => setField('dose_g', e.target.value)} />
-            <input type="text" placeholder="Mesh #" value={slot.mesh} onChange={(e) => setField('mesh', e.target.value)} />
-          </div>
+        <span className="qcd-slot-mark">{MARKS[index]}</span>
+        <div className="qcd-slot-dosemesh">
+          <label>Dose<input type="number" step="0.1" placeholder="g" value={slot.dose_g} onChange={(e) => setField('dose_g', e.target.value)} />g</label>
+          <label>Mesh #<input type="text" value={slot.mesh} onChange={(e) => setField('mesh', e.target.value)} /></label>
         </div>
         {removable && <button type="button" className="qcd-remove-btn" onClick={onRemove}>{MARKS[index]} を削除</button>}
       </div>

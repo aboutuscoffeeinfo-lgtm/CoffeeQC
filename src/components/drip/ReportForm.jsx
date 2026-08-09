@@ -96,16 +96,18 @@ export default function ReportForm({ onSave, showToast }) {
       </div>
 
       <p className="qcd-section-title">抽出欄</p>
-      {draft.slots.map((slot, i) => (
-        <QCSlot
-          key={i}
-          slot={slot}
-          index={i}
-          onChange={(s) => setSlot(i, s)}
-          onRemove={() => removeSlot(i)}
-          removable={draft.slots.length > MIN_SLOTS}
-        />
-      ))}
+      <div className="qcd-slots-grid">
+        {draft.slots.map((slot, i) => (
+          <QCSlot
+            key={i}
+            slot={slot}
+            index={i}
+            onChange={(s) => setSlot(i, s)}
+            onRemove={() => removeSlot(i)}
+            removable={draft.slots.length > MIN_SLOTS}
+          />
+        ))}
+      </div>
       <button type="button" className="qcd-add-slot" onClick={addSlot}>+ 抽出欄を追加</button>
 
       <p className="qcd-section-title">傾向</p>

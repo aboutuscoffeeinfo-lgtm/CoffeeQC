@@ -49,12 +49,12 @@ export default function App() {
   return (
     <div id="qcd-app">
       <div className="qcd-header">
-        <p className="qcd-brand">ABOUT US COFFEE</p>
-        <h1>ドリップ抽出 QC報告書</h1>
-      </div>
-      <div className="qcd-tabs">
-        <button className={'qcd-tab' + (activeTab === 'new' ? ' active' : '')} onClick={() => changeTab('new')}>新規入力</button>
-        <button className={'qcd-tab' + (activeTab === 'history' ? ' active' : '')} onClick={() => changeTab('history')}>履歴（{reports.length}）</button>
+        <p className="qcd-brand">QC報告書</p>
+        <h1>About Us Coffee — ドリップ品質管理</h1>
+        <div className="qcd-tabs">
+          <button className={'qcd-tab' + (activeTab === 'new' ? ' active' : '')} onClick={() => changeTab('new')}>新規入力</button>
+          <button className={'qcd-tab' + (activeTab === 'history' ? ' active' : '')} onClick={() => changeTab('history')}>履歴（{reports.length}）</button>
+        </div>
       </div>
       <div className="qcd-body">
         {toast && <div className={toast.isError ? 'qcd-toast-err' : 'qcd-toast'}>{toast.text}</div>}
