@@ -29,14 +29,14 @@ export default function History({ reports, onDelete, onAddComment }) {
     : [];
 
   const startComment = (reportId) => setNewComment((n) => ({ ...n, [reportId]: [emptyComment()] }));
-  const submitComment = async (reportId) => {
-    const rows = newComment[reportId] || [];
+  const submitComment = async (report) => {
+    const rows = newComment[report.id] || [];
     for (const c of rows) {
       if (c.comment || c.date || c.roast_date) {
-        await onAddComment(reportId, c);
+        await onAddComment(report, c);
       }
     }
-    setNewComment((n) => ({ ...n, [reportId]: undefined }));
+    setNewComment((n) => ({ ...n, [report.id]: undefined }));
   };
 
   return (
@@ -120,7 +120,7 @@ export default function History({ reports, onDelete, onAddComment }) {
                 {rows ? (
                   <div style={{ marginTop: 10 }}>
                     <CommentsSection comments={rows} onChange={(next) => setNewComment((n) => ({ ...n, [r.id]: next }))} />
-                    <button type="button" className="qcd-save-btn" onClick={() => submitComment(r.id)}>コメントを保存</button>
+                    <button type="button" className="qcd-save-btn" onClick={() => submitComment(r)}>コメントを保存</button>
                   </div>
                 ) : (
                   <button type="button" className="qcd-add-comment" style={{ marginTop: 10 }} onClick={() => startComment(r.id)}>+ コメントを追加</button>

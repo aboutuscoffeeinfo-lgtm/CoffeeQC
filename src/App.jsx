@@ -28,9 +28,9 @@ export default function App() {
     setReports((rs) => rs.filter((r) => r.id !== id));
   }, []);
 
-  const onAddComment = useCallback(async (reportId, comment) => {
-    const saved = await addComment(reportId, comment);
-    setReports((rs) => rs.map((r) => (r.id === reportId ? { ...r, qc_comments: [...r.qc_comments, saved] } : r)));
+  const onAddComment = useCallback(async (report, comment) => {
+    const saved = await addComment(report, comment);
+    setReports((rs) => rs.map((r) => (r.id === report.id ? { ...r, qc_comments: [...r.qc_comments, saved] } : r)));
     return saved;
   }, []);
 

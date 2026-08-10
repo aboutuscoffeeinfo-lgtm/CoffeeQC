@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { ATTRS, ATTR_LABEL, INTENSITY_OPTIONS, MARKS } from '../../lib/constants';
 
 function emptyPour() {
@@ -67,7 +68,7 @@ export default function QCSlot({ slot, index, onChange, onRemove, removable }) {
         </thead>
         <tbody>
           {ATTRS.map((attr) => (
-            <>
+            <Fragment key={attr}>
               <tr key={attr + 'H'}>
                 <td className="qcd-attr-cell" rowSpan={2}>{ATTR_LABEL[attr]}</td>
                 <td className="qcd-hw-cell">H</td>
@@ -89,7 +90,7 @@ export default function QCSlot({ slot, index, onChange, onRemove, removable }) {
                 </td>
                 <td><input type="number" min="1" max="5" value={slot.sensory[attr].W.quality} onChange={(e) => setSensory(attr, 'W', 'quality', e.target.value)} /></td>
               </tr>
-            </>
+            </Fragment>
           ))}
         </tbody>
       </table>
