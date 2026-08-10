@@ -8,7 +8,7 @@ function emptyDraft() {
   return {
     store: STORES[0], date: iso, country: '', lot_name: '', variety: '', process: '',
     roast_date: '', checker: '', tendency: '',
-    slots: [emptySlot(), emptySlot(), emptySlot(), emptySlot()],
+    slots: [emptySlot()],
     comments: [],
   };
 }

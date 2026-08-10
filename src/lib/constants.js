@@ -11,7 +11,7 @@ export const ATTR_LABEL = {
 
 export const MARKS = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
 
-export const MIN_SLOTS = 4;
+export const MIN_SLOTS = 1;
 
 export const INTENSITY_OPTIONS = ['Low', 'Medium-Low', 'Medium', 'Medium-High', 'High'];
 
