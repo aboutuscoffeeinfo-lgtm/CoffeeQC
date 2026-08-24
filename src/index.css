@@ -137,8 +137,6 @@ body {
   .qcd-section-title { font-size: 11px; margin: 18px 0 8px; }
   .qcd-extra-box { padding: 12px; }
   .qcd-grid4 { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  #qcd-app input[type="date"] { font-size: 12px; padding: 5px 6px; }
-  #qcd-app input[type="date"]::-webkit-date-and-time-value { font-size: 12px; }
   .qcd-slot { padding: 12px; }
   .qcd-slot-head { flex-wrap: wrap; row-gap: 8px; }
   .qcd-slot-dosemesh { gap: 10px; }
