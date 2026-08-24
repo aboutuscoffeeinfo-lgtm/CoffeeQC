@@ -37,13 +37,13 @@ body {
   border: 1px solid var(--line); border-radius: 8px; background: #fff;
   padding: 7px 9px; width: 100%;
 }
-#qcd-app input[type="date"] {
-  font-size: 13px;
-  padding: 6px 8px;
+#qcd-app input:not([type="checkbox"]):not([type="radio"]), #qcd-app select {
+  height: 38px;
 }
 #qcd-app input[type="date"]::-webkit-date-and-time-value {
   text-align: left;
   font-size: 13px;
+  min-height: 1em;
 }
 #qcd-app input:focus, #qcd-app select:focus, #qcd-app textarea:focus {
   outline: none; border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber-soft);
