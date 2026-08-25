@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { STORES, MIN_SLOTS } from '../../lib/constants';
 import QCSlot, { emptySlot } from './QCSlot';
 import CommentsSection from './CommentsSection';
+import DateField from './DateField';
 
 function emptyDraft() {
   const iso = new Date().toISOString().slice(0, 10);
@@ -66,7 +67,7 @@ export default function ReportForm({ onSave, showToast }) {
           </div>
           <div className="qcd-field">
             <label>日付</label>
-            <input type="date" value={draft.date} onChange={(e) => setField('date', e.target.value)} />
+            <DateField value={draft.date} onChange={(v) => setField('date', v)} />
           </div>
           <div className="qcd-field">
             <label>国</label>
@@ -86,7 +87,7 @@ export default function ReportForm({ onSave, showToast }) {
           </div>
           <div className="qcd-field">
             <label>焙煎日</label>
-            <input type="date" value={draft.roast_date} onChange={(e) => setField('roast_date', e.target.value)} />
+            <DateField value={draft.roast_date} onChange={(v) => setField('roast_date', v)} />
           </div>
           <div className="qcd-field">
             <label>確認</label>

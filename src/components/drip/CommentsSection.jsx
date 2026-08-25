@@ -1,3 +1,5 @@
+import DateField from './DateField';
+
 export function emptyComment() {
   const iso = new Date().toISOString().slice(0, 10);
   return { date: iso, roast_date: '', comment: '' };
@@ -18,11 +20,11 @@ export default function CommentsSection({ comments, onChange }) {
         <div className="qcd-comment-row" key={ci}>
           <div>
             <label>日付</label>
-            <input type="date" value={c.date} onChange={(e) => setField(ci, 'date', e.target.value)} />
+            <DateField value={c.date} onChange={(v) => setField(ci, 'date', v)} />
           </div>
           <div>
             <label>焙煎日</label>
-            <input type="date" value={c.roast_date} onChange={(e) => setField(ci, 'roast_date', e.target.value)} />
+            <DateField value={c.roast_date} onChange={(v) => setField(ci, 'roast_date', v)} />
           </div>
           <div>
             <label>コメント</label>

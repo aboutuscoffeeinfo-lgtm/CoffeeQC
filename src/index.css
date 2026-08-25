@@ -40,13 +40,21 @@ body {
 #qcd-app input:not([type="checkbox"]):not([type="radio"]), #qcd-app select {
   height: 38px;
 }
-#qcd-app input[type="date"]::-webkit-date-and-time-value {
-  text-align: left;
-  font-size: 13px;
-  min-height: 1em;
-}
 #qcd-app input:focus, #qcd-app select:focus, #qcd-app textarea:focus {
   outline: none; border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber-soft);
+}
+
+.qcd-date-field { position: relative; height: 38px; }
+.qcd-date-display {
+  height: 38px; border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  padding: 7px 9px; font-size: 13px; color: var(--ink);
+  display: flex; align-items: center; pointer-events: none;
+}
+.qcd-date-placeholder { color: #9a9a9a; }
+.qcd-date-field:focus-within .qcd-date-display { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber-soft); }
+.qcd-date-field input[type="date"] {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; border: none; padding: 0; margin: 0;
 }
 .qcd-loading { padding: 2rem; text-align: center; color: var(--ink-soft); font-size: 14px; }
 
