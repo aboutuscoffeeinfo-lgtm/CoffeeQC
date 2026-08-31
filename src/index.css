@@ -61,7 +61,7 @@ body {
 .qcd-header { padding: 24px 24px 16px; border-bottom: 1px solid var(--line); }
 .qcd-header .qcd-brand { font-family: var(--voice); font-weight: 700; font-size: 26px; letter-spacing: 0.02em; color: var(--amber-strong); margin: 0 0 4px; }
 .qcd-header h1 { font-size: 13px; font-weight: 400; color: var(--ink-soft); margin: 0 0 16px; }
-.qcd-tabs { display: flex; gap: 8px; }
+.qcd-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 .qcd-tab { padding: 8px 18px; font-size: 13px; font-weight: 700; color: var(--ink-soft); background: transparent; border: 1px solid var(--line); border-radius: 999px; }
 .qcd-tab.active { background: var(--amber); color: #FFFCF6; border-color: var(--amber); }
 
@@ -116,9 +116,30 @@ body {
 .qcd-comment-row label { display: block; font-size: 10px; color: var(--ink-soft); margin-bottom: 3px; }
 .qcd-add-comment { border: 1px dashed var(--amber); background: var(--amber-soft); color: var(--dark); font-size: 12px; font-weight: 600; padding: 8px; border-radius: 8px; width: 100%; }
 
-.qcd-save-btn { padding: 11px 32px; border: none; background: var(--amber); color: #FFFCF6; font-size: 14px; font-weight: 700; border-radius: 999px; margin-top: 18px; display: block; margin-left: auto; }
+.qcd-save-row { display: flex; justify-content: flex-end; gap: 12px; margin-top: 18px; }
+.qcd-save-btn { padding: 11px 32px; border: none; background: var(--amber); color: #FFFCF6; font-size: 14px; font-weight: 700; border-radius: 999px; }
 .qcd-save-btn:disabled { opacity: 0.5; }
+.qcd-draft-btn { padding: 11px 24px; border: 1px solid var(--line); background: transparent; color: var(--ink-soft); font-size: 14px; font-weight: 700; border-radius: 999px; }
+.qcd-draft-btn:disabled { opacity: 0.5; }
 .qcd-note { text-align: center; font-size: 12px; color: var(--ink-soft); margin-top: 10px; }
+
+.qcd-drafts-card { background: var(--amber-soft); border: 1px solid var(--amber); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+.qcd-drafts-title { font-family: var(--voice); font-size: 16px; color: var(--amber-strong); margin: 0 0 4px; }
+.qcd-drafts-desc { color: var(--ink-soft); font-size: 12px; margin: 0 0 12px; }
+.qcd-draft-row { width: 100%; display: flex; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; color: var(--ink); cursor: pointer; text-align: left; font-size: 13px; margin-bottom: 8px; }
+.qcd-draft-row:last-child { margin-bottom: 0; }
+.qcd-draft-date { color: var(--ink-soft); white-space: nowrap; }
+.qcd-draft-lot { margin-left: auto; font-family: var(--voice); color: var(--amber-strong); white-space: nowrap; }
+
+.qcd-release-field { flex-direction: row; align-items: center; gap: 10px; }
+.qcd-toggle { position: relative; width: 42px; height: 24px; border-radius: 999px; border: 1px solid var(--line); background: #fff; cursor: pointer; flex-shrink: 0; padding: 0; }
+.qcd-toggle.on { background: var(--amber); border-color: var(--amber); }
+.qcd-toggle-knob { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink-soft); transition: left 0.15s ease, background 0.15s ease; }
+.qcd-toggle.on .qcd-toggle-knob { left: 20px; background: #FFFCF6; }
+
+.qcd-released-note { color: var(--ink-soft); font-size: 12px; margin: 0 0 16px; }
+.qcd-released-row { width: 100%; display: flex; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; color: var(--ink); font-size: 13px; margin-bottom: 8px; }
+.qcd-released-cvp { flex: 1; }
 
 .qcd-filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
 .qcd-filters label { display: block; font-size: 11px; color: var(--ink-soft); margin-bottom: 4px; font-weight: 600; }
@@ -151,6 +172,8 @@ body {
   .qcd-comment-row { grid-template-columns: 1fr 1fr; }
   .qcd-comment-row > div:nth-child(3) { grid-column: 1 / -1; }
   .qcd-comment-row > button { grid-column: 1 / -1; justify-self: end; }
-  .qcd-save-btn { width: 100%; margin-left: 0; }
+  .qcd-save-row { flex-wrap: wrap; }
+  .qcd-draft-btn { flex: 1; padding: 11px 12px; white-space: nowrap; }
+  .qcd-save-btn { flex: 2; padding: 11px 12px; white-space: nowrap; }
   .qcd-filters { grid-template-columns: 1fr; }
 }

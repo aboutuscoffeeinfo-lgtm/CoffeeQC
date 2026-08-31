@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchReports, saveReport, deleteReport, addComment } from './lib/db';
+import { fetchReports, upsertReport, deleteReport, addComment, toggleReleased } from './lib/db';
 import ReportForm from './components/drip/ReportForm';
 import History from './components/drip/History';
+import ReleasedTab from './components/drip/ReleasedTab';
 
 export default function App() {
   const [reports, setReports] = useState(null);
@@ -18,8 +19,11 @@ export default function App() {
   }, []);
 
   const onSaveReport = useCallback(async (payload) => {
-    const saved = await saveReport(payload);
-    setReports((rs) => [saved, ...rs]);
+    const saved = await upsertReport(payload);
+    setReports((rs) => {
+      const exists = rs.some((r) => r.id === saved.id);
+      return exists ? rs.map((r) => (r.id === saved.id ? saved : r)) : [saved, ...rs];
+    });
     return saved;
   }, []);
 
@@ -34,6 +38,11 @@ export default function App() {
     return saved;
   }, []);
 
+  const onToggleReleased = useCallback(async (id, value) => {
+    const saved = await toggleReleased(id, value);
+    setReports((rs) => rs.map((r) => (r.id === id ? { ...r, is_released: saved.is_released } : r)));
+  }, []);
+
   const changeTab = (tab) => {
     setActiveTab(tab);
     setToast(null);
@@ -46,6 +55,9 @@ export default function App() {
     return <div id="qcd-app"><div className="qcd-loading">読み込み中…</div></div>;
   }
 
+  const drafts = reports.filter((r) => r.status === 'draft');
+  const savedReports = reports.filter((r) => r.status !== 'draft');
+
   return (
     <div id="qcd-app">
       <div className="qcd-header">
@@ -53,15 +65,20 @@ export default function App() {
         <h1>About Us Coffee — ドリップ品質管理</h1>
         <div className="qcd-tabs">
           <button className={'qcd-tab' + (activeTab === 'new' ? ' active' : '')} onClick={() => changeTab('new')}>新規入力</button>
-          <button className={'qcd-tab' + (activeTab === 'history' ? ' active' : '')} onClick={() => changeTab('history')}>履歴（{reports.length}）</button>
+          <button className={'qcd-tab' + (activeTab === 'history' ? ' active' : '')} onClick={() => changeTab('history')}>履歴（{savedReports.length}）</button>
+          <button className={'qcd-tab' + (activeTab === 'released' ? ' active' : '')} onClick={() => changeTab('released')}>リリース中</button>
         </div>
       </div>
       <div className="qcd-body">
         {toast && <div className={toast.isError ? 'qcd-toast-err' : 'qcd-toast'}>{toast.text}</div>}
-        {activeTab === 'new' ? (
-          <ReportForm onSave={onSaveReport} showToast={showToast} />
-        ) : (
-          <History reports={reports} onDelete={onDeleteReport} onAddComment={onAddComment} />
+        {activeTab === 'new' && (
+          <ReportForm drafts={drafts} onSave={onSaveReport} showToast={showToast} />
+        )}
+        {activeTab === 'history' && (
+          <History reports={savedReports} onDelete={onDeleteReport} onAddComment={onAddComment} />
+        )}
+        {activeTab === 'released' && (
+          <ReleasedTab reports={savedReports} onToggleReleased={onToggleReleased} />
         )}
       </div>
     </div>

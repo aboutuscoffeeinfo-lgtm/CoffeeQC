@@ -31,28 +31,44 @@ export async function fetchReports() {
   }));
 }
 
-export async function saveReport({ report, slots, comments }) {
-  const { data: savedReport, error: reportError } = await supabase
-    .from('qc_reports')
-    .insert(report)
-    .select()
-    .single();
-  if (reportError) throw new Error(reportError.message);
+export async function upsertReport({ id, report, slots, comments }) {
+  let savedReport;
+  if (id) {
+    const { data, error } = await supabase.from('qc_reports').update(report).eq('id', id).select().single();
+    if (error) throw new Error(error.message);
+    savedReport = data;
+
+    const { error: delError } = await supabase.from('qc_slots').delete().eq('report_id', id);
+    if (delError) throw new Error(delError.message);
+  } else {
+    const { data, error } = await supabase.from('qc_reports').insert(report).select().single();
+    if (error) throw new Error(error.message);
+    savedReport = data;
+  }
 
   const slotRows = slots.map((s, i) => ({ ...s, report_id: savedReport.id, slot_index: i + 1 }));
   const { data: savedSlots, error: slotsError } = await supabase.from('qc_slots').insert(slotRows).select();
   if (slotsError) throw new Error(slotsError.message);
 
-  let savedComments = [];
-  if (comments.length > 0) {
-    const commentRows = comments.map((c) => ({ ...normalizeComment(c), report_id: savedReport.id }));
+  const existingComments = comments.filter((c) => c.id);
+  const newComments = comments.filter((c) => !c.id && (c.comment || c.date || c.roast_date));
+
+  let insertedComments = [];
+  if (newComments.length > 0) {
+    const commentRows = newComments.map((c) => ({ ...normalizeComment(c), report_id: savedReport.id }));
     const { data, error: commentsError } = await supabase.from('qc_comments').insert(commentRows).select();
     if (commentsError) throw new Error(commentsError.message);
-    savedComments = data;
-    for (const c of savedComments) await notifyComment(savedReport, c);
+    insertedComments = data;
+    for (const c of insertedComments) await notifyComment(savedReport, c);
   }
 
-  return { ...savedReport, qc_slots: savedSlots, qc_comments: savedComments };
+  return { ...savedReport, qc_slots: savedSlots, qc_comments: [...existingComments, ...insertedComments] };
+}
+
+export async function toggleReleased(id, isReleased) {
+  const { data, error } = await supabase.from('qc_reports').update({ is_released: isReleased }).eq('id', id).select().single();
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 export async function addComment(report, comment) {

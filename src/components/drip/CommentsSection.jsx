@@ -28,9 +28,9 @@ export default function CommentsSection({ comments, onChange }) {
           </div>
           <div>
             <label>コメント</label>
-            <input type="text" placeholder="気づき・味の変化など" value={c.comment} onChange={(e) => setField(ci, 'comment', e.target.value)} />
+            <textarea rows={2} placeholder="気づき・味の変化・違和感などを記入してください" value={c.comment} onChange={(e) => setField(ci, 'comment', e.target.value)} />
           </div>
-          <button type="button" className="qcd-pour-remove" onClick={() => removeComment(ci)}>×</button>
+          {ci > 0 && <button type="button" className="qcd-pour-remove" onClick={() => removeComment(ci)}>×</button>}
         </div>
       ))}
       <button type="button" className="qcd-add-comment" onClick={addComment}>+ コメントを追加</button>

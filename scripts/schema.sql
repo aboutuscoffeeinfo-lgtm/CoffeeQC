@@ -19,6 +19,8 @@ create table qc_reports (
   roast_date date,
   checker text not null default '',
   tendency text not null default '',
+  status text not null default 'saved',
+  is_released boolean not null default false,
   created_at timestamptz not null default now()
 );
 

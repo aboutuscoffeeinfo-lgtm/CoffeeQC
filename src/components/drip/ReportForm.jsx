@@ -3,20 +3,39 @@ import { STORES, MIN_SLOTS } from '../../lib/constants';
 import QCSlot, { emptySlot } from './QCSlot';
 import CommentsSection from './CommentsSection';
 import DateField from './DateField';
+import Toggle from './Toggle';
 
 function emptyDraft() {
   const iso = new Date().toISOString().slice(0, 10);
   return {
-    store: STORES[0], date: iso, country: '', lot_name: '', variety: '', process: '',
-    roast_date: '', checker: '', tendency: '',
+    id: null, store: STORES[0], date: iso, country: '', lot_name: '', variety: '', process: '',
+    roast_date: '', checker: '', tendency: '', is_released: false,
     slots: [emptySlot()],
     comments: [],
   };
 }
 
-export default function ReportForm({ onSave, showToast }) {
+function fromReport(r) {
+  return {
+    id: r.id, store: r.store, date: r.date, country: r.country, lot_name: r.lot_name,
+    variety: r.variety, process: r.process, roast_date: r.roast_date || '', checker: r.checker,
+    tendency: r.tendency, is_released: r.is_released,
+    slots: r.qc_slots.length > 0
+      ? r.qc_slots.map((s) => ({ dose_g: s.dose_g, mesh: s.mesh, pours: s.pours, sensory: s.sensory, remarks: s.remarks }))
+      : [emptySlot()],
+    comments: r.qc_comments.map((c) => ({ id: c.id, date: c.date || '', roast_date: c.roast_date || '', comment: c.comment })),
+  };
+}
+
+function fmtDate(iso) {
+  if (!iso) return '（日付未入力）';
+  const [y, m, d] = iso.split('-');
+  return `${y}/${m}/${d}`;
+}
+
+export default function ReportForm({ drafts, onSave, showToast }) {
   const [draft, setDraft] = useState(emptyDraft);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState(null); // 'draft' | 'saved' | null
 
   const setField = (field, value) => setDraft((d) => ({ ...d, [field]: value }));
   const setSlot = (i, slot) => setDraft((d) => {
@@ -27,10 +46,11 @@ export default function ReportForm({ onSave, showToast }) {
   const addSlot = () => setDraft((d) => ({ ...d, slots: [...d.slots, emptySlot()] }));
   const removeSlot = (i) => setDraft((d) => ({ ...d, slots: d.slots.filter((_, idx) => idx !== i) }));
 
-  const handleSave = async () => {
-    setSaving(true);
+  const handleSave = async (status) => {
+    setSaving(status);
     try {
       await onSave({
+        id: draft.id,
         report: {
           store: draft.store,
           date: draft.date,
@@ -41,21 +61,37 @@ export default function ReportForm({ onSave, showToast }) {
           roast_date: draft.roast_date || null,
           checker: draft.checker,
           tendency: draft.tendency,
+          is_released: draft.is_released,
+          status,
         },
         slots: draft.slots,
-        comments: draft.comments.filter((c) => c.comment || c.date || c.roast_date),
+        comments: draft.comments,
       });
-      showToast('記録を保存しました。');
-      setDraft(emptyDraft());
+      showToast(status === 'draft' ? '下書きを保存しました。' : '記録を保存しました。');
+      if (status === 'saved') setDraft(emptyDraft());
     } catch (e) {
       showToast('保存に失敗しました。もう一度お試しください。', true);
     } finally {
-      setSaving(false);
+      setSaving(null);
     }
   };
 
   return (
     <>
+      {drafts.length > 0 && (
+        <div className="qcd-drafts-card">
+          <p className="qcd-drafts-title">下書き</p>
+          <p className="qcd-drafts-desc">途中まで入力した報告書です。続きから編集できます。</p>
+          {drafts.map((d) => (
+            <button type="button" className="qcd-draft-row" key={d.id} onClick={() => setDraft(fromReport(d))}>
+              <span className="qcd-draft-date">{fmtDate(d.date)}</span>
+              <span>{d.country}/{d.variety}/{d.process}</span>
+              <span className="qcd-draft-lot">{d.lot_name || '（ロット名未入力）'}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       <p className="qcd-section-title">報告書ヘッダー</p>
       <div className="qcd-extra-box">
         <div className="qcd-grid4">
@@ -93,6 +129,10 @@ export default function ReportForm({ onSave, showToast }) {
             <label>確認</label>
             <input type="text" placeholder="確認者名" value={draft.checker} onChange={(e) => setField('checker', e.target.value)} />
           </div>
+          <div className="qcd-field qcd-release-field">
+            <label>リリース中</label>
+            <Toggle on={draft.is_released} onChange={(v) => setField('is_released', v)} />
+          </div>
         </div>
       </div>
 
@@ -119,9 +159,14 @@ export default function ReportForm({ onSave, showToast }) {
       <p className="qcd-section-title">コメント</p>
       <CommentsSection comments={draft.comments} onChange={(comments) => setField('comments', comments)} />
 
-      <button type="button" className="qcd-save-btn" disabled={saving} onClick={handleSave}>
-        {saving ? '保存中…' : '記録を保存'}
-      </button>
+      <div className="qcd-save-row">
+        <button type="button" className="qcd-draft-btn" disabled={!!saving} onClick={() => handleSave('draft')}>
+          {saving === 'draft' ? '保存中…' : '一時保存'}
+        </button>
+        <button type="button" className="qcd-save-btn" disabled={!!saving} onClick={() => handleSave('saved')}>
+          {saving === 'saved' ? '保存中…' : '保存する'}
+        </button>
+      </div>
       <p className="qcd-note">保存したデータは伏見・二条の全スタッフと共有されます</p>
     </>
   );
