@@ -15,7 +15,7 @@ function emptyDraft() {
   };
 }
 
-function fromReport(r) {
+export function fromReport(r) {
   return {
     id: r.id, store: r.store, date: r.date, country: r.country, lot_name: r.lot_name,
     variety: r.variety, process: r.process, roast_date: r.roast_date || '', checker: r.checker,
@@ -33,8 +33,8 @@ function fmtDate(iso) {
   return `${y}/${m}/${d}`;
 }
 
-export default function ReportForm({ drafts, onSave, showToast }) {
-  const [draft, setDraft] = useState(emptyDraft);
+export default function ReportForm({ drafts = [], initialReport, mode = 'new', onSave, showToast, onDone }) {
+  const [draft, setDraft] = useState(() => (initialReport ? fromReport(initialReport) : emptyDraft()));
   const [saving, setSaving] = useState(null); // 'draft' | 'saved' | null
 
   const setField = (field, value) => setDraft((d) => ({ ...d, [field]: value }));
@@ -67,8 +67,12 @@ export default function ReportForm({ drafts, onSave, showToast }) {
         slots: draft.slots,
         comments: draft.comments,
       });
-      showToast(status === 'draft' ? '下書きを保存しました。' : '記録を保存しました。');
-      if (status === 'saved') setDraft(emptyDraft());
+      showToast(status === 'draft' ? '下書きを保存しました。' : mode === 'edit' ? '更新しました。' : '記録を保存しました。');
+      if (mode === 'edit') {
+        onDone?.();
+      } else if (status === 'saved') {
+        setDraft(emptyDraft());
+      }
     } catch (e) {
       showToast('保存に失敗しました。もう一度お試しください。', true);
     } finally {
@@ -78,7 +82,7 @@ export default function ReportForm({ drafts, onSave, showToast }) {
 
   return (
     <>
-      {drafts.length > 0 && (
+      {mode === 'new' && drafts.length > 0 && (
         <div className="qcd-drafts-card">
           <p className="qcd-drafts-title">下書き</p>
           <p className="qcd-drafts-desc">途中まで入力した報告書です。続きから編集できます。</p>
@@ -160,12 +164,23 @@ export default function ReportForm({ drafts, onSave, showToast }) {
       <CommentsSection comments={draft.comments} onChange={(comments) => setField('comments', comments)} />
 
       <div className="qcd-save-row">
-        <button type="button" className="qcd-draft-btn" disabled={!!saving} onClick={() => handleSave('draft')}>
-          {saving === 'draft' ? '保存中…' : '一時保存'}
-        </button>
-        <button type="button" className="qcd-save-btn" disabled={!!saving} onClick={() => handleSave('saved')}>
-          {saving === 'saved' ? '保存中…' : '保存する'}
-        </button>
+        {mode === 'edit' ? (
+          <>
+            {onDone && <button type="button" className="qcd-draft-btn" disabled={!!saving} onClick={onDone}>キャンセル</button>}
+            <button type="button" className="qcd-save-btn" disabled={!!saving} onClick={() => handleSave('saved')}>
+              {saving === 'saved' ? '保存中…' : '更新を保存'}
+            </button>
+          </>
+        ) : (
+          <>
+            <button type="button" className="qcd-draft-btn" disabled={!!saving} onClick={() => handleSave('draft')}>
+              {saving === 'draft' ? '保存中…' : '一時保存'}
+            </button>
+            <button type="button" className="qcd-save-btn" disabled={!!saving} onClick={() => handleSave('saved')}>
+              {saving === 'saved' ? '保存中…' : '保存する'}
+            </button>
+          </>
+        )}
       </div>
       <p className="qcd-note">保存したデータは伏見・二条の全スタッフと共有されます</p>
     </>

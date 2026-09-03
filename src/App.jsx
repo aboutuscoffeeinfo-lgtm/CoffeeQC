@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchReports, upsertReport, deleteReport, addComment, toggleReleased } from './lib/db';
+import { fetchReports, upsertReport, deleteReport, toggleReleased } from './lib/db';
 import ReportForm from './components/drip/ReportForm';
 import History from './components/drip/History';
 import ReleasedTab from './components/drip/ReleasedTab';
@@ -30,12 +30,6 @@ export default function App() {
   const onDeleteReport = useCallback(async (id) => {
     await deleteReport(id);
     setReports((rs) => rs.filter((r) => r.id !== id));
-  }, []);
-
-  const onAddComment = useCallback(async (report, comment) => {
-    const saved = await addComment(report, comment);
-    setReports((rs) => rs.map((r) => (r.id === report.id ? { ...r, qc_comments: [...r.qc_comments, saved] } : r)));
-    return saved;
   }, []);
 
   const onToggleReleased = useCallback(async (id, value) => {
@@ -75,7 +69,7 @@ export default function App() {
           <ReportForm drafts={drafts} onSave={onSaveReport} showToast={showToast} />
         )}
         {activeTab === 'history' && (
-          <History reports={savedReports} onDelete={onDeleteReport} onAddComment={onAddComment} />
+          <History reports={savedReports} onDelete={onDeleteReport} onSave={onSaveReport} showToast={showToast} />
         )}
         {activeTab === 'released' && (
           <ReleasedTab reports={savedReports} onToggleReleased={onToggleReleased} />

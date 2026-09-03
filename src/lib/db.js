@@ -51,7 +51,15 @@ export async function upsertReport({ id, report, slots, comments }) {
   if (slotsError) throw new Error(slotsError.message);
 
   const existingComments = comments.filter((c) => c.id);
-  const newComments = comments.filter((c) => !c.id && (c.comment || c.date || c.roast_date));
+  const newComments = comments.filter((c) => !c.id && c.comment && c.comment.trim());
+
+  if (id) {
+    const keepIds = existingComments.map((c) => c.id);
+    let delQuery = supabase.from('qc_comments').delete().eq('report_id', id);
+    if (keepIds.length > 0) delQuery = delQuery.not('id', 'in', `(${keepIds.join(',')})`);
+    const { error: delCommentsError } = await delQuery;
+    if (delCommentsError) throw new Error(delCommentsError.message);
+  }
 
   let insertedComments = [];
   if (newComments.length > 0) {
@@ -68,17 +76,6 @@ export async function upsertReport({ id, report, slots, comments }) {
 export async function toggleReleased(id, isReleased) {
   const { data, error } = await supabase.from('qc_reports').update({ is_released: isReleased }).eq('id', id).select().single();
   if (error) throw new Error(error.message);
-  return data;
-}
-
-export async function addComment(report, comment) {
-  const { data, error } = await supabase
-    .from('qc_comments')
-    .insert({ ...normalizeComment(comment), report_id: report.id })
-    .select()
-    .single();
-  if (error) throw new Error(error.message);
-  await notifyComment(report, data);
   return data;
 }
 
